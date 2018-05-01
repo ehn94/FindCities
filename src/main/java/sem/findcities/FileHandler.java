@@ -13,6 +13,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -20,11 +23,15 @@ import java.util.ArrayList;
  */
 public class FileHandler {
 
+    private static final String TAG_REGEX = "<LOCATION>(.*?)</LOCATION>";
+    private static final Pattern TAG_PATTERN = Pattern.compile(TAG_REGEX);
+
     public void readAllWordsWithCapitalLetters(String fileName) {
         FileReader TheFileReader;
         BufferedReader TheBufferedReader;
         String newLine;
         String filename = "C:\\Users\\ehn19\\Documents\\Skole\\Softwareudvikling\\Databaser\\Books\\BookSample\\" + fileName;
+
         try {
             TheFileReader = new FileReader(new File(filename));
             TheBufferedReader = new BufferedReader(TheFileReader);
@@ -37,7 +44,7 @@ public class FileHandler {
                         cityArr.add(w);
                     }
                 }
-                writeFile(cityArr, "SortedByCapitalLetter\\" + fileName);
+                writeCapitalFile(cityArr, "SortedByCapitalLetter\\" + fileName);
             }
             TheBufferedReader.close();
         } catch (FileNotFoundException ex) {
@@ -53,25 +60,25 @@ public class FileHandler {
         FileReader TheFileReader;
         BufferedReader TheBufferedReader;
         String newLine;
-        String filename = "C:\\Users\\ehn19\\Documents\\Skole\\Softwareudvikling\\Databaser\\Books\\Test\\" + fileName;
-        
+        String filename = "C:\\Users\\ehn19\\Documents\\Skole\\Softwareudvikling\\Databaser\\Books\\TaggedFiles\\" + fileName;
+
         try {
             TheFileReader = new FileReader(new File(filename));
             TheBufferedReader = new BufferedReader(TheFileReader);
             while ((newLine = TheBufferedReader.readLine()) != null) {
-                
+
                 ArrayList<String> cityArr = new ArrayList();
-                String[] words = newLine.split("\\r?\\n");
+                String[] words = newLine.split(",");
+                String val;
                 for (String w : words) {
-                    if (w.matches("Should match <LOCATION>")) {
-                        System.out.println("Matches!");
-                        cityArr.add(w);
-                    }else
-                    {
-                        System.out.println("Does not match!");
+                    Matcher m = TAG_PATTERN.matcher(w);
+                    if (m.matches()) {
+                        val = getTagValues(w);
+                        System.out.println(val);
+                        cityArr.add(val);
                     }
                 }
-                writeFile(cityArr, "Final\\" + fileName);
+                writeFinalFile(cityArr, "Final\\" + fileName);
             }
             TheBufferedReader.close();
         } catch (FileNotFoundException ex) {
@@ -81,7 +88,15 @@ public class FileHandler {
             System.out.println("Could not read from file!");
             System.out.println(ex.toString());
         }
-        
+    }
+
+    private static String getTagValues(final String str) {
+        final String tagValues;
+        final Matcher matcher = TAG_PATTERN.matcher(str);
+        matcher.find();
+        tagValues = matcher.group(1);
+
+        return tagValues;
     }
 
     public ArrayList<String> listFilesForFolder(final File folder) {
@@ -96,7 +111,21 @@ public class FileHandler {
         return entries;
     }
 
-    public void writeFile(ArrayList<String> strArr, String filename) {
+    public void writeCapitalFile(ArrayList<String> strArr, String filename) {
+        String fileName = "C:\\Users\\ehn19\\Documents\\Skole\\Softwareudvikling\\Databaser\\Books\\" + filename;
+        try (FileWriter fw = new FileWriter(fileName, true);
+                BufferedWriter bw = new BufferedWriter(fw);) {
+
+            for (String s : strArr) {
+                bw.write(s + ",");
+            }
+
+        } catch (IOException ex) {
+            ex.toString();
+        }
+    }
+
+    public void writeFinalFile(ArrayList<String> strArr, String filename) {
         String fileName = "C:\\Users\\ehn19\\Documents\\Skole\\Softwareudvikling\\Databaser\\Books\\" + filename;
         try (FileWriter fw = new FileWriter(fileName, true);
                 BufferedWriter bw = new BufferedWriter(fw);) {
@@ -105,6 +134,7 @@ public class FileHandler {
                 bw.write(s);
                 bw.newLine();
             }
+
         } catch (IOException ex) {
             ex.toString();
         }

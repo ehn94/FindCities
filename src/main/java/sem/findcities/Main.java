@@ -17,12 +17,15 @@ public class Main {
         FileHandler fh = new FileHandler();
         ArrayList<String> entries = new ArrayList();
         
-        final File folder = new File("C:\\Users\\ehn19\\Documents\\Skole\\Softwareudvikling\\Databaser\\Books\\Test");
+        String toCapitalize = "BookSample";
+        String toLocationTag = "TaggedFiles";
+        
+        final File folder = new File("C:\\Users\\ehn19\\Documents\\Skole\\Softwareudvikling\\Databaser\\Books\\" + toLocationTag);
         entries = fh.listFilesForFolder(folder);
         for(String s : entries)
         {
-            fh.readAllCities(s);
-            //fh.readAllWordsWithCapitalLetters(s);
+           fh.readAllCities(s);
+//            fh.readAllWordsWithCapitalLetters(s);
         }
     }
 }
