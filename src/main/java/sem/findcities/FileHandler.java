@@ -25,8 +25,11 @@ public class FileHandler {
 
     private static final String TAG_REGEX = "<LOCATION>(.*?)</LOCATION>";
     private static final Pattern TAG_PATTERN = Pattern.compile(TAG_REGEX);
-    private static final String CAPITAL_REGEX = "([A-Z][a-z']*)(\\\\s[A-Z][a-z']*)*";
 
+    /*
+        Læser filerne igennem og splitter hver gang der er et location tag.
+        Kalder getTagValues()
+    */
     public void readAllCities(String fileName) {
         FileReader TheFileReader;
         BufferedReader TheBufferedReader;
@@ -43,11 +46,9 @@ public class FileHandler {
                 
                 String val;
                 for (String w : words) {
-                    System.out.println(w);
                     Matcher m = TAG_PATTERN.matcher(w);
                     if (m.matches()) {
                         val = getTagValues(w);
-                        System.out.println(val);
                         cityArr.add(val);
                     }
                 }
@@ -62,48 +63,9 @@ public class FileHandler {
             System.out.println(ex.toString());
         }
     }
-    
-    public void readAllCities1(String fileName) {
-        FileReader TheFileReader;
-        BufferedReader TheBufferedReader;
-        String newLine;
-        String filename = "C:\\Users\\ehn19\\Documents\\Skole\\Softwareudvikling\\Databaser\\Books\\stanford-ner-2018-02-27\\Output\\" + fileName;
-
-        try {
-            TheFileReader = new FileReader(new File(filename));
-            TheBufferedReader = new BufferedReader(TheFileReader);
-            while ((newLine = TheBufferedReader.readLine()) != null) {
-                
-                ArrayList<String> cityArr = new ArrayList();
-                String[] words = newLine.split(",");
-                
-                String val;
-                for (String w : words) {
-                    System.out.println(w);
-                    Matcher m = TAG_PATTERN.matcher(w);
-                    if (m.matches()) {
-                        val = getTagValues(w);
-                        System.out.println(val);
-                        cityArr.add(val);
-                    }
-                }
-                writeFinalFile(cityArr, "Final\\" + fileName);
-            }
-            TheBufferedReader.close();
-        } catch (FileNotFoundException ex) {
-            System.out.println("Could not find file!");
-            System.out.println(ex.toString());
-        } catch (IOException ex) {
-            System.out.println("Could not read from file!");
-            System.out.println(ex.toString());
-        }
-    }
-    
-    private ArrayList<String> readFile(String fileName){
-        ArrayList<String> sentences = new ArrayList();
-        return sentences;
-    }
-
+    /*
+        Trækker tekst værdien ud fra location tags
+    */
     private static String getTagValues(final String str) {
         final String tagValues;
         final Matcher matcher = TAG_PATTERN.matcher(str);
@@ -112,19 +74,9 @@ public class FileHandler {
 
         return tagValues;
     }
-
-    public ArrayList<String> listFilesForFolder(final File folder) {
-        ArrayList<String> entries = new ArrayList();
-        for (final File fileEntry : folder.listFiles()) {
-            if (fileEntry.isDirectory()) {
-                listFilesForFolder(fileEntry);
-            } else {
-                entries.add(fileEntry.getName());
-            }
-        }
-        return entries;
-    }
-
+    /*
+        Skriver filen med de færdige resultater. 
+    */
     public void writeFinalFile(ArrayList<String> strArr, String filename) {
         String fileName = "C:\\Users\\ehn19\\Documents\\Skole\\Softwareudvikling\\Databaser\\Books\\" + filename;
         try (FileWriter fw = new FileWriter(fileName, true);
@@ -134,7 +86,6 @@ public class FileHandler {
                 bw.write(s);
                 bw.newLine();
             }
-
         } catch (IOException ex) {
             ex.toString();
         }
